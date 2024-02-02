@@ -8,6 +8,7 @@ Created on Tue Jan 30 12:21:05 2024
 
 
 # %%
+
 import os
 import numpy as np
 import pandas as pd
@@ -15,17 +16,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
-
+import plotly.graph_objects as go
 import warnings
 warnings.filterwarnings('ignore')
 
 
-#%%
+# %%
+
 for dirname, _, filenames in os.walk('results/'):
     for filename in filenames:
         print(os.path.join(dirname, filename))
 
-#%%
+# %%
 
 current_path = os.getcwd()
 print("Current Working Directory: ",current_path)
@@ -39,6 +41,7 @@ print(os.path.join(DATA_PATH, FILE_CONSOLIDATED_DATA))
 
 
 # %%
+
 # Lista de columnas a interpretar como fecha
 columns_dates=[
     'date'
@@ -50,16 +53,17 @@ sales_data = pd.read_csv(
     parse_dates=columns_dates
     )
 
-#%%
+# %%
+
 sales_data.info()
 sales_data.columns
 
-#%%
-'''
-Transaction Type Distribution
+# %%
+'''Transaction Type Distribution'''
 
-'''
-#%%
+
+# %%
+
 print("Unique transaction types:", sales_data['trans_type'].nunique())
 print(sales_data['trans_type'].value_counts())
 print("Missing bank names:", sales_data['bank_name'].isnull().sum())
@@ -67,9 +71,10 @@ print("Unique banks:", sales_data['bank_name'].nunique())
 print(sales_data['bank_name'].value_counts())
 
 
-#%%
-''' Numero de Transacciones por banco
-'''
+# %%
+
+#Numero de Transacciones por banco
+
 trans_type_by_bank = sales_data.groupby(
     'bank_name').agg(
         {'payment_key':'count',
@@ -87,9 +92,9 @@ trans_type_by_bank.to_csv(
     index=False
     )
 
-#%%
-''' Numero de Transacciones por tipo de transaccion.
-'''
+# %%
+
+#Numero de Transacciones por tipo de transaccion.
 
 trans_type_agg = sales_data.groupby(
     'trans_type').agg(
@@ -108,7 +113,9 @@ trans_type_agg.to_csv(
     index=False
     )
 
-#%%
+
+# %%
+
 fig = plt.figure(figsize=(6,6), dpi=100)
 sns.barplot(x='trans_type', y='number_of_purchases', data=trans_type_agg, palette='magma')
 plt.title('Transaction Type Distribution')
@@ -123,16 +130,19 @@ plt.ylabel('Transaction Type', fontsize=16, labelpad=20, color='maroon')
 plt.savefig('results/EDA/TransactionTypeDistribution.png')
 #plt.show()
 
-#%%
+
+# %%
+
 fig = px.bar(trans_type_agg, x='trans_type', y='number_of_purchases', 
              title="Transaction Type", hover_data=['trans_type', 'number_of_purchases','total_spent'], color='trans_type',
              labels={'total_spent':'Total Spent','number_of_purchases':'Num Sales','trans_type':'Transaction type'}, height=600,text_auto=True)
-fig.write_html("results/HTML/TransactionTypeDistribution.html")
+fig.write_html("results/EDA/TransactionTypeDistribution.html")
 #fig.show()
 
 
-#%%
-'''Pie Chart Transacction type'''
+# %%
+
+#Pie Chart Transacction type
 
 fig = plt.figure(figsize=(6,6), dpi=100)
 ax = plt.subplot(111)
@@ -149,20 +159,24 @@ plt.savefig('results/EDA/Pie-TransactionTypeDistribution.png')
 #plt.show()
 
 #sales_data.plot(kind='pie', y='trans_type', labels=df['team'])
-#%%Pie chart using px
+
+# %%
+
+#Pie chart using px
+
 fig = px.pie(trans_type_agg, names='trans_type', values='number_of_purchases', color='number_of_purchases', 
              title="Transaction Type",labels={'trans_type':'Transaction type','number_of_purchases':'Purchases'}, height=600)
 fig.update_traces(textposition='inside', textinfo='percent')
-fig.write_html("results/HTML/PieTransactionTypeDistribution.html")
+fig.write_html("results/EDA/Pie-TransactionTypeDistribution.html")
 #fig.show()
 
 
 
-#%%
-'''
-Customer Analysis
-'''
-#%%
+# %%
+
+'''# Customer Analysis'''
+
+# %%
 print("\nUnique names:", sales_data['customer_name'].nunique())
 print("Missing names:", sales_data['customer_name'].isnull().sum())
 print(sales_data['customer_name'].value_counts())
@@ -189,8 +203,11 @@ customer_analysis.to_csv(
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
-#%%
-#Top 10 Customers
+
+# %%
+
+## Top 10 Customers
+
 print(customer_analysis.sort_values(by='total_spent', ascending=False).head(10))
 plt.figure(figsize=(14, 9))
 sns.barplot(x='total_spent', y='customer_name', 
@@ -209,61 +226,74 @@ plt.tight_layout()
 plt.savefig('results/EDA/Top10Customers.png')
 #plt.show()
 
-#%%
-customer_analysis.sort_values(by='total_spent', ascending=False).head(20)
+# %%
+
+customer_analysis.sort_values(by='total_spent', ascending=False).head(10)
 fig = px.bar(customer_analysis.sort_values(by='total_spent', ascending=False).head(20), x='total_spent', y='customer_name',  orientation='h',
              title="Top 10 Customers", hover_data=['customer_name', 'number_of_purchases','total_spent'], color='total_spent',
              labels={'total_spent':'Total Spent','number_of_purchases':'Num Sales','customer_name':'Name'}, height=600,text_auto=True)
-fig.write_html("results/HTML/Top20Customers.html")
+fig.write_html("results/EDA/Top10Customers.html")
 #fig.show()
 
-#%%
-'''
-Top 20 Customers by Total Spent
 
-The bar chart of the top 20 customers by total spent clearly shows that the top customer, 
-Pooja, has a significantly higher total spending than the others. 
-There is a gradual decline in spending among the remaining top customers. 
-This reinforces the importance of the top spenders to the overall sales and 
-may suggest that personalized marketing strategies or loyalty programs 
-could be effective for maintaining their engagement.
-'''
-#%%
+# %%
+
+'''Top 20 Customers by Total Spent'''
+
+'''Top 20 Customers by Total Spent
+ 
+# The bar chart of the top 20 customers by total spent clearly shows that the top customer, 
+# Pooja, has a significantly higher total spending than the others. 
+# There is a gradual decline in spending among the remaining top customers. 
+# This reinforces the importance of the top spenders to the overall sales and 
+# may suggest that personalized marketing strategies or loyalty programs 
+# could be effective for maintaining their engagement.'''
+
+# %%
+
 #Distribution of Total Spent by Customers
 
 fig = px.histogram(customer_analysis, x='total_spent',
                    title='Distribution of Total Spent by Customers',
                    nbins=500000,text_auto=True)  # Adjust the number of bins as needed
 fig.update_layout(xaxis_title='Total Spent', yaxis_title='Count of Customers')
-fig.write_html('results/HTML/DistributionTotalSpentbyCustomers.html')
+fig.write_html('results/EDA/DistributionTotalSpentbyCustomers.html')
 #fig.show()
-#%%
-'''
-Distribution of Total Spent by Customers
 
-The histogram shows that most customers spend in the lower monetary range, 
-with a very steep drop-off as spending amounts increase. This further indicates 
-that there are only a few high-spending customers, while the majority spend much less.
-'''
-#%%
+# %%
+'''Distribution of Total Spent by Customers'''
+
+'''#|Distribution of Total Spent by Customers
+#|
+#|The histogram shows that most customers spend in the lower monetary range, 
+#|with a very steep drop-off as spending amounts increase. This further indicates 
+#|that there are only a few high-spending customers, while the majority spend much less.'''
+
+
+# %%
+
 #Number of Purchases vs Total Spent by Customers
+
 fig = px.scatter(customer_analysis, x='number_of_purchases', y='total_spent', color='total_spent',
                  hover_name='customer_name', title='Number of Purchases vs Total Spent by Customers',size='total_spent')
 fig.update_layout(xaxis_title='Number of Purchases', yaxis_title='Total Spent')
-fig.write_html('results/HTML/NumberofPurchases.html')
+fig.write_html('results/EDA/NumberofPurchases.html')
 #fig.show()
-#%%
-'''
-Number of Purchases vs Total Spent by Customers
 
-The scatter plot suggests a positive correlation between the number of purchases 
-and the total amount spent, which is to be expected. However, there are customers
- with a high number of purchases but relatively lower total spending, indicating 
- they may be buying less expensive items more frequently. Conversely, 
- there are customers with fewer purchases but higher spending, possibly indicating 
- larger transactions or the purchase of higher-priced items.
-'''
-#%%
+# %%
+
+'''Number of Purchases vs Total Spent by Customers'''
+
+'''#The scatter plot suggests a positive correlation between the number of purchases 
+#and the total amount spent, which is to be expected. However, there are customers
+# with a high number of purchases but relatively lower total spending, indicating 
+# they may be buying less expensive items more frequently. Conversely, 
+# there are customers with fewer purchases but higher spending, possibly indicating 
+# larger transactions or the purchase of higher-priced items.'''
+
+
+# %%
+
 #Cumulative Distribution of Total Spent by Customers
 
 customer_analysis_sorted = customer_analysis.sort_values('total_spent', ascending=False)
@@ -282,39 +312,43 @@ fig = px.line(customer_analysis_sorted, y='cumulative_percentage',
               title='Cumulative Distribution of Total Spent by Customers')
 fig.update_layout(xaxis_title='Number of Customers', yaxis_title='Cumulative Percentage of Total Spent')
 fig.update_xaxes(range=[0, 1000])  # Adjust the range as needed
-fig.write_html('results/HTML/CumulativeDistributionofTotalSpentbyCustomers.html')
+fig.write_html('results/EDA/CumulativeDistributionofTotalSpentbyCustomers.html')
 #fig.show()
-#%%
-'''
-Cumulative Distribution of Total Spent by Customers
 
-This line graph shows that a small number of customers account for a large percentage
- of the total spending. This kind of distribution is typical of a Pareto principle
- (or 80/20 rule) where the majority of sales come from a minority of customers. 
- This indicates that the business might rely on a core group of high-spending customers.
-'''
-#%%
-'''
-Overall Summary
+# %%
 
-The customer analysis data and the visualizations suggest that the business has a 
-wide range of customers, but is heavily supported by a small segment of high-value customers. 
-The company might benefit from strategies aimed at increasing the spend of lower-tier customers 
-while maintaining the loyalty of the top-tier ones. Understanding the purchasing patterns and 
-preferences of these key segments could drive targeted marketing campaigns, 
-personalized promotions, and tailored product recommendations to enhance 
-customer value across the board.
+'''Cumulative Distribution of Total Spent by Customers'''
 
-Given the importance of the top spending customers, a customer relationship management (CRM) 
-strategy could be particularly effective. Additionally, analyzing the data to understand
- the factors influencing the higher number of transactions and the high-value purchases
- could provide actionable insights for business growth and customer satisfaction improvement.
-'''
+'''#|This line graph shows that a small number of customers account for a large percentage
+#| of the total spending. This kind of distribution is typical of a Pareto principle
+#| (or 80/20 rule) where the majority of sales come from a minority of customers. 
+#| This indicates that the business might rely on a core group of high-spending customers.'''
 
 
-#%%
-''' Product Analysis
+# %%
+
+'''Overall Summary'''
+
+'''#|The customer analysis data and the visualizations suggest that the business has a 
+#|wide range of customers, but is heavily supported by a small segment of high-value customers. 
+#|The company might benefit from strategies aimed at increasing the spend of lower-tier customers 
+#|while maintaining the loyalty of the top-tier ones. Understanding the purchasing patterns and 
+#|preferences of these key segments could drive targeted marketing campaigns, 
+#|personalized promotions, and tailored product recommendations to enhance 
+#|customer value across the board.
+#|
+#|Given the importance of the top spending customers, a customer relationship management (CRM) 
+#|strategy could be particularly effective. Additionally, analyzing the data to understand
+#| the factors influencing the higher number of transactions and the high-value purchases
+#| could provide actionable insights for business growth and customer satisfaction improvement.
 '''
+
+# %%
+
+''' # Product Analysis'''
+
+# %%
+
 sales_data.info()
 sales_data.columns
 
@@ -343,14 +377,17 @@ print("Missing units:", sales_data['item_unit'].isnull().sum())
 print(sales_data['item_unit'].value_counts())
 
 
-#%%
-'''How many sales and total incomes by Suppliers and country
-'''
+# %%
+
+#'''How many sales and total incomes by Suppliers and country
+
 suppliers_performance = sales_data.groupby(
     ['item_supplier','item_man_country']).agg(        
         {'item_key':'count', # suma de los precios de los artículos
         'fact_total_price': 'sum'}
-                      ).reset_index().rename(columns={'item_key':'number_of_sales','fact_total_price':'total_revenue'})
+                      ).reset_index().rename(columns={
+                          'item_key':'number_of_sales',
+                          'fact_total_price':'total_revenue'})
 
 
 suppliers_performance.head()
@@ -363,7 +400,8 @@ suppliers_performance.to_csv(
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
-#%%
+
+# %%
 
 ax = sns.barplot(x='total_revenue',y='item_supplier', data=suppliers_performance, palette="dark",
                  order=suppliers_performance.sort_values('total_revenue', ascending=False).item_supplier)
@@ -374,13 +412,24 @@ plt.title('Revenue by supplier')
 plt.savefig('results/EDA/RevenueBySuppliers.png')
 #plt.show()        
 
-#%%
+
+# %%
+
+fig = px.bar(suppliers_performance.sort_values('total_revenue', ascending=False), x='total_revenue', y='item_supplier', 
+             title="Revenue by supplier", hover_data=['total_revenue', 'item_supplier','number_of_sales'], color='item_supplier',
+             labels={'total_revenue':'Total Revenue','number_of_sales':'Num Sales','item_supplier':'Supplier'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/RevenueBySuppliers.html")
+#fig.show()
+
+
+# %%
+
 fig = plt.figure(figsize=(6,6), dpi=100)
-suppliers_performance = suppliers_performance.sort_values('number_of_sales', ascending=False)
 g = sns.catplot(
-    data=suppliers_performance, kind="bar",
+    data=suppliers_performance.sort_values('number_of_sales', ascending=False), kind="bar",
     x="number_of_sales", y="item_supplier", 
-    errorbar="sd", palette="dark", alpha=.8, height=8
+    errorbar="sd", palette="dark", alpha=.8, height=6, 
 )
 plt.title('Sales by supplier')
 g.despine(left=True)
@@ -389,37 +438,25 @@ plt.savefig('results/EDA/SalesBySuppliers.png')
 #plt.show()      
 
 
-#%%
-'''Product sold by manufacturer 
-'''
-sales_data.info()
-sales_data.columns
- 
-product_by_suppliers_performance = sales_data.groupby(
-    ['item_name','item_desc','item_supplier','item_man_country']).agg(        
-        {'item_key':'count', # suma de los precios de los artículos
-        'fact_total_price': 'sum'}
-                      ).reset_index().rename(columns={
-                          'item_key':'number_of_sales',
-                          'fact_total_price':'total_revenue'})
+# %%
 
-product_by_suppliers_performance.head()
-product_by_suppliers_performance.sample()
-product_by_suppliers_performance.info()
-product_by_suppliers_performance.to_csv(
-    # nombre del archivo
-    'results/EDA/product_by_suppliers_performance.csv', 
-    # flag para no escribir el indice del dataframe al csv
-    index=False
-    )
-#%%
-#items_by_suppliers_performance= items_by_suppliers_performance.sort_values('total_revenue', ascending=False)
+
+fig = px.bar(suppliers_performance.sort_values('number_of_sales', ascending=False), x='number_of_sales', y='item_supplier', 
+             title="Salese by supplier", hover_data=['number_of_sales', 'item_supplier','total_revenue'], color='item_supplier',
+             labels={'total_revenue':'Total Revenue','number_of_sales':'Num Sales','item_supplier':'Supplier'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/SalesBySuppliers.html")
+#fig.show()
+
+
+# %%
+
+country_sales = sales_data.groupby('item_man_country')['fact_total_price'].sum().reset_index()
 
 # Count plot for 'man_country'
 fig, ax = plt.subplots()
-sns.countplot(y='item_man_country', data=product_by_suppliers_performance, palette="dark",alpha=.8,
-              order = product_by_suppliers_performance['item_man_country'].value_counts().index,
-              ax=ax)
+sns.barplot(data=country_sales.sort_values('fact_total_price', ascending=False), x='fact_total_price', y='item_man_country', 
+            palette="dark",alpha=.8, ax=ax)
 # Add axis labels
 ax.set(xlabel='Products', ylabel='Manufacturing Countries')
 
@@ -427,10 +464,26 @@ plt.title('Distribution of Manufacturing Countries')
 plt.savefig('results/EDA/DistributionManufacturingCountries.png')
 #plt.show()
 
-#%%
-'''Store Analysis
-'''
+# %%
+
+fig = px.bar(country_sales.sort_values('fact_total_price', ascending=False), x='fact_total_price', y='item_man_country', 
+             title="Distribution of Manufacturing Countries", hover_data=['fact_total_price', 'item_man_country'], 
+             color='item_man_country',
+             labels={'fact_total_price':'Total Revenue','item_man_country':'Country Supplier'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/DistributionManufacturingCountries.html")
+#fig.show()
+
+
+# %%
+
+'''Store Analysis'''
+
+
+# %%
+
 # Unique values and value counts for 'region'
+
 print("\nRegions: ", sales_data['store_region'].nunique())
 print("\nSales by Regions:\n",sales_data['store_region'].value_counts())
 print("\Revenue by Regions:\n",sales_data.groupby('store_region')['fact_total_price'].sum().reset_index())
@@ -450,13 +503,17 @@ print("\nStores: ", sales_data['store_key'].nunique())
 print("\nSales by Store:\n",sales_data['store_key'].value_counts())
 print("\Revenue by Store:\n",sales_data.groupby('store_key')['fact_total_price'].sum().reset_index())
 
-#%%
-'''store performance by Region, District, Sub-District
-'''
-#%%
+# %%
+
+'''store performance by Region, District, Sub-District'''
+
+
+# %%
+
 #To Revenue-Generating by Region
+
 region_sales = sales_data.groupby('store_region')['fact_total_price'].sum().reset_index()
-print(region_sales.sort_values(by='fact_total_price', ascending=False).head(10))
+print(region_sales.sort_values(by='fact_total_price', ascending=False))
 region_sales.to_csv(
     # nombre del archivo
     'results/EDA/region_sales.csv', 
@@ -468,7 +525,7 @@ plt.figure(figsize=(12, 8))
 sns.barplot(x='fact_total_price', y='store_region', 
             data=region_sales.sort_values(by='fact_total_price', ascending=False), palette='coolwarm')
 
-plt.title('Top Revenue-Generating Regions', fontsize=16, fontweight='bold', color='navy')
+plt.title('Top 10 Revenue-Generating Regions', fontsize=16, fontweight='bold', color='navy')
 plt.xlabel('Total Revenue', fontsize=14, labelpad=15, color='navy')
 plt.ylabel('Region', fontsize=14, labelpad=15, color='navy')
 plt.xticks(fontsize=12, color='navy')
@@ -478,8 +535,22 @@ plt.tight_layout()
 plt.savefig('results/EDA/TopRevenue-GeneratingRegions.png')
 #plt.show()
 
-#%%
+
+# %%
+
+fig = px.bar(region_sales.sort_values(by='fact_total_price', ascending=False), x='fact_total_price', y='store_region', 
+             title="Top 10 Revenue-Generating Revenue by Region", hover_data=['fact_total_price', 'store_region'], 
+             color='store_region',
+             labels={'fact_total_price':'Total Revenue','store_region':'Region'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/TopRevenue-GeneratingRegions.html")
+#fig.show()
+
+
+# %%
+
 #Top 10 Revenue-Generating by District
+
 district_sales = sales_data.groupby('store_district')['fact_total_price'].sum().reset_index()
 print(district_sales .sort_values(by='fact_total_price', ascending=False).head(10))
 
@@ -505,36 +576,110 @@ plt.tight_layout()
 plt.savefig('results/EDA/Top10Revenue-GeneratingbyDistrict.png')
 #plt.show()
 
+# %%
+
+fig = px.bar(district_sales.sort_values(by='fact_total_price', ascending=False).head(10), x='fact_total_price', y='store_district', 
+             title="Top 10 Revenue-Generating Revenue by District", hover_data=['fact_total_price', 'store_district'], 
+             color='store_district',
+             labels={'fact_total_price':'Total Revenue','store_district':'District'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/Top10Revenue-GeneratingbyDistrict.html")
+#fig.show()
+
+
+# %%
+'''Time Analysis'''
+
+
 #%%
-'''Time Analysis
-'''
+
 # Summary statistics for 'year'
+
 print("\nYear Statistics, Sales per year:")
 print(sales_data['year'].value_counts())
 
-#%%
+
+# %%
+
+# Summary statistics for 'year'
+
+sales_by_year = sales_data.groupby(
+    ['year']).agg(        
+        {'time_key':'count', # suma de los precios de los artículos
+        'fact_total_price': 'sum'}
+                      ).reset_index().rename(columns={
+                          'time_key':'number_of_sales',
+                          'fact_total_price':'total_revenue'})
+              
+
 # Creating a bar plot for the distribution of years directly from the DataFrame
 plt.figure(figsize=(10,6))
-sns.countplot(x='year', data=sales_data, order = sales_data['year'].value_counts().index, palette='dark')
-plt.title('Distribution of Years')
+sns.barplot(data=sales_by_year, x='year', y='number_of_sales',palette='dark')
+plt.title('Sales Distribution by Years')
 plt.xlabel('Year')
-plt.ylabel('Frequency')
+plt.ylabel('Sales')
 plt.xticks(rotation=45)  # Rotate the x labels for better readability if necessary
 
 plt.savefig('results/EDA/SalesDistributionofYears.png')
 #plt.show()
 
-#%%
-'''More analysis
-'''
-#%%
+# %%
+fig = px.bar(sales_by_year, x='year', y='number_of_sales', 
+             title="Sales Distribution by Years", hover_data=['year', 'number_of_sales'], 
+             color='year',
+             labels={'year':'Year','number_of_sales':'Total Sales'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/SalesDistributionofYears.html")
+#fig.show()
+
+# %%
+
+plt.figure(figsize=(10,6))
+sns.barplot(data=sales_by_year, x='year', y='total_revenue',palette='dark')
+plt.title('Distribution of Years')
+plt.xlabel('Year')
+plt.ylabel('Revenue')
+plt.xticks(rotation=45)  # Rotate the x labels for better readability if necessary
+
+plt.savefig('results/EDA/RevenueDistributionofYears.png')
+#plt.show()
+
+# %%
+
+fig = px.bar(sales_by_year, x='year', y='total_revenue', 
+             title="Revenue Distribution by Years", hover_data=['year', 'total_revenue'], 
+             color='year',
+             labels={'year':'Year','total_revenue':'Total Revenue'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/RevenueDistributionofYears.html")
+#fig.show()
+
+# %%
+
+'''More analysis'''
+
+# %%
+
 # Histogram for 'total_price'
+
 sns.histplot(sales_data['fact_total_price'], kde=True, bins=30)
 plt.title('Distribution of Total Prices')
 plt.savefig('results/EDA/DistributionofTotalPrices.png')
 #plt.show()
 
-#%%
+# %%
+
+#Histogram for 'total_price'
+
+fig = px.histogram(sales_data, x='fact_total_price',
+                   title='Distribution of Total Prices',
+                   nbins=30,text_auto=True, labels={'fact_total_price':'Price','count':'Sales'})  # Adjust the number of bins as needed
+fig.update_layout(xaxis_title='Total Price', yaxis_title='Count of Sales')
+fig.write_html('results/EDA/DistributionofTotalPrices.html')
+#fig.show()
+
+# %%
+
 # Merging the fact_table with the time_dim on 'time_key'
 
 sales_data.columns
@@ -547,73 +692,69 @@ monthly_sales.to_csv(
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
+
+# %%
+
 plt.figure(figsize=(15,7))
 sns.lineplot(x='year_month', y='fact_total_price', data=monthly_sales, marker='o')
-plt.title('Total Sales Over Time (Monthly)')
+plt.title('Total Renenue Over Time (Monthly)')
 plt.xlabel('Year-Month')
-plt.ylabel('Total Sales')
+plt.ylabel('Total Revenue')
 plt.xticks(rotation=45)  # Rotate the x labels for better readability
 plt.grid(True)
-plt.savefig('results/EDA/TotalSalesOverTime(Monthly).png')
+plt.savefig('results/EDA/TotalRevenueOverTime_Monthly.png')
 #plt.show()
 
-#%%
+
+# %%
+
+fig = px.line(monthly_sales,x='year_month', y='fact_total_price',
+              title='Total Sales Over Time (Monthly)',labels={'year_month':'Month','fact_total_price':'Total Revenue'})
+fig.update_layout(xaxis_title='Year-Month', yaxis_title='Total Sales')
+fig.write_html('results/EDA/TotalRevenueOverTime_Monthly.html')
+#fig.show()
+
+
+# %%
+
+
 #Top 10 Revenue-Generating Items
-item_sales = sales_data.groupby('item_name')['fact_total_price'].sum().reset_index()
 
-top_items_by_sales = item_sales.sort_values(by='fact_total_price', ascending=False)
-
-print(top_items_by_sales.head(10))
-
-top_items_by_sales = item_sales.sort_values(by='fact_total_price', ascending=False).head(10)
-
-plt.figure(figsize=(12, 8))
-sns.barplot(x='fact_total_price', y='item_name', data=top_items_by_sales, palette='viridis')
-
-plt.title('Top 10 Revenue-Generating Items', fontsize=16, fontweight='bold', color='navy')
-plt.xlabel('Total Revenue', fontsize=14, labelpad=15, color='navy')
-plt.ylabel('Item Name', fontsize=14, labelpad=15, color='navy')
-plt.xticks(fontsize=12, color='navy')
-plt.yticks(fontsize=12, color='navy')
-plt.grid(color='gray', linestyle='--', linewidth=0.5)
-plt.tight_layout()  
-plt.savefig('results/EDA/Top10Revenue-GeneratingItems.png')
-#plt.show()
-
-#%%
-#Top 10 Revenue-Generating Items
 item_sales = sales_data.groupby('item_name')['fact_total_price'].sum().reset_index()
 
 print(item_sales.sort_values(by='fact_total_price', ascending=False).head(10))
 
-item_sales.to_csv(
-    # nombre del archivo
-    'results/EDA/top_items_by_sales.csv', 
-    # flag para no escribir el indice del dataframe al csv
-    index=False
-    )
-
 plt.figure(figsize=(12, 8))
 sns.barplot(x='fact_total_price', y='item_name', 
-            data=item_sales.sort_values(by='fact_total_price', ascending=False).head(10), 
-            palette='viridis')
+            data=item_sales.sort_values(by='fact_total_price', ascending=False).head(10), palette='viridis')
 
-plt.title('Top 10 Revenue-Generating Items', fontsize=16, fontweight='bold', color='navy')
+plt.title('Top 10 Revenue-Generating Products', fontsize=16, fontweight='bold', color='navy')
 plt.xlabel('Total Revenue', fontsize=14, labelpad=15, color='navy')
-plt.ylabel('Item Name', fontsize=14, labelpad=15, color='navy')
+plt.ylabel('Product Name', fontsize=14, labelpad=15, color='navy')
 plt.xticks(fontsize=12, color='navy')
 plt.yticks(fontsize=12, color='navy')
 plt.grid(color='gray', linestyle='--', linewidth=0.5)
 plt.tight_layout()  
 plt.savefig('results/EDA/Top10Revenue-GeneratingItems.png')
-
 #plt.show()
 
-#%%
+# %%
+
+fig = px.bar(item_sales.sort_values(by='fact_total_price', ascending=False).head(10), x='fact_total_price', y='item_name', 
+             title="Top 10 Revenue-Generating Products", hover_data=['fact_total_price', 'item_name'], 
+             color='item_name',
+             labels={'fact_total_price':'Total Revenue','item_name':'Products'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/Top10Revenue-GeneratingItems.html")
+#fig.show()
+
+# %%
+
 #Top 10 Revenue-Generating Descriptions
+
 desc_sales = sales_data.groupby('item_desc')['fact_total_price'].sum().reset_index()
 
-#top_desc_sales = desc_sales.sort_values(by='fact_total_price', ascending=False).head(10)
+
 desc_sales.to_csv(
     # nombre del archivo
     'results/EDA/desc_sales.csv', 
@@ -638,9 +779,21 @@ plt.tight_layout()
 plt.savefig('results/EDA/Top10Revenue-GeneratingDescriptions.png')
 #plt.show()
 
+# %%
 
-#%%
+fig = px.bar(desc_sales.sort_values(by='fact_total_price', ascending=False).head(10), x='fact_total_price', y='item_desc', 
+             title="Top 10 Revenue-Generating Descriptions", hover_data=['fact_total_price', 'item_desc'], 
+             color='item_desc',
+             labels={'fact_total_price':'Total Revenue','item_desc':'Description'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/Top10Revenue-GeneratingDescriptions.html")
+#fig.show()
+
+
+# %%
+
 #Total Quantity Sold
+
 item_sales_quantity = sales_data.groupby('item_name')['fact_quantity'].sum().reset_index()
 
 print(item_sales_quantity.sort_values(by='fact_quantity', ascending=False).head(10))
@@ -666,13 +819,26 @@ plt.grid(color='gray', linestyle='--', linewidth=0.5)
 plt.tight_layout() 
 
 plt.savefig('results/EDA/Top10ItemsbyQuantitySold.png')
+
 #plt.show()
 
-#%%
-#Top 10 Divisions by Total Sales
-division_sales = sales_data.groupby('store_region')['fact_total_price'].sum().reset_index()
 
-#top_divisions_by_sales = division_sales.sort_values(by='fact_total_price', ascending=False).head(10)
+# %%
+
+fig = px.bar(desc_sales.sort_values(by='fact_total_price', ascending=False).head(10), x='fact_total_price', y='item_desc', 
+             title="Top 10 Revenue-Generating Descriptions", hover_data=['fact_total_price', 'item_desc'], 
+             color='item_desc',
+             labels={'fact_total_price':'Total Revenue','item_desc':'Description'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/Top10Revenue-GeneratingDescriptions.html")
+#fig.show()
+
+
+# %%
+
+#Top 10 Divisions by Total Sales
+
+division_sales = sales_data.groupby('store_region')['fact_total_price'].sum().reset_index()
 
 print(division_sales.sort_values(by='fact_total_price', ascending=False).head(10))
 
@@ -688,7 +854,7 @@ sns.barplot(x='fact_total_price', y='store_region',
             data=division_sales.sort_values(by='fact_total_price', ascending=False).head(10), palette='inferno')
 
 # Enhance the plot's aesthetics
-plt.title('Top 10 Divisions by Total Sales', fontsize=18, fontweight='bold', color='maroon')
+plt.title('Total Revenue by Region', fontsize=18, fontweight='bold', color='maroon')
 plt.xlabel('Total Sales', fontsize=16, labelpad=20, color='maroon')
 plt.ylabel('Region', fontsize=16, labelpad=20, color='maroon')
 plt.xticks(fontsize=14, color='maroon')
@@ -696,11 +862,23 @@ plt.yticks(fontsize=14, color='maroon')
 plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
 plt.tight_layout()  
-plt.savefig('results/EDA/Top10DivisionsbyTotalSales.png')
+plt.savefig('results/EDA/TotalRevenuebyRegion.png')
 #plt.show()
 
-#%%
+# %%
+
+fig = px.bar(division_sales.sort_values(by='fact_total_price', ascending=False).head(10), x='fact_total_price', y='store_region', 
+             title="Total Revenue by Region", hover_data=['fact_total_price', 'store_region'], 
+             color='store_region',
+             labels={'fact_total_price':'Total Revenue','store_region':'Region'}, 
+             height=600,text_auto=True)
+fig.write_html("results/EDA/TotalRevenuebyRegion.html")
+#fig.show()
+
+# %%
+
 #Top 5 Performing Items in Each Division
+
 division_item_sales = sales_data.groupby(['store_region', 'item_name'])['fact_total_price'].sum().reset_index()
 
 # Sorting the items within each division by total sales in descending order
@@ -737,7 +915,18 @@ plt.tight_layout()
 plt.savefig('results/EDA/Top5PerformingItemsinEachRegion.png')
 #plt.show()
 
-#%%
+# %%
+
+fig = px.bar(top_5_items_in_division, x='fact_total_price', y='store_region', 
+             title="Top 5 Performing Items in Each Region", hover_data=['fact_total_price', 'store_region'], 
+             color='item_name',
+             labels={'fact_total_price':'Total Revenue','store_region':'Region','item_name':'Product'}, 
+             height=800,text_auto=True)
+fig.update_layout(barmode='group', xaxis={'categoryorder':'category ascending'})
+fig.write_html("results/EDA/Top5PerformingItemsinEachRegion.html")
+#fig.show()
+
+# %%
 g = sns.FacetGrid(top_5_items_in_division, col='store_region', col_wrap=3, height=4, sharex=False)
 g.map(sns.barplot, 'fact_total_price', 'item_name', 
       order=top_5_items_in_division['item_name'].unique(), palette='viridis')
@@ -750,23 +939,43 @@ plt.tight_layout()
 plt.savefig('results/EDA/Top5PerformingItemsinEachRegionByRegion.png')
 #plt.show()
 
-#%% Predictive Analytics
+# %%
+
+fig = px.bar(top_5_items_in_division, x='fact_total_price', y='item_name', 
+             title="Top 5 Performing Items in Each Region", hover_data=['fact_total_price', 'store_region'], 
+             color='item_name', facet_col='store_region', facet_col_wrap=3,
+             labels={'fact_total_price':'Total Revenue','store_region':'Region','item_name':'Product'}, 
+             height=800)
+fig.update_layout(barmode='group', xaxis={'categoryorder':'category ascending'})
+fig.write_html("results/EDA/Top5PerformingItemsinEachRegionByRegion.html")
+#fig.show()
+
+# %% 
+'''# Predictive Analytics#|'''
+
+# %%
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.stattools import adfuller
 import warnings
 
 warnings.filterwarnings("ignore")
-#%%
-monthly_sales.to_csv(
+
+# %%
+
+monthly_sales_train = monthly_sales
+
+monthly_sales_train.index = pd.to_datetime(monthly_sales_train['year_month'])
+
+monthly_sales_train.to_csv(
     # nombre del archivo
-    'results/Analytics/monthly_sales.csv', 
+    'results/Analytics/monthly_sales_train.csv', 
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
-monthly_sales.index = pd.to_datetime(monthly_sales['year_month'])
 
-train_data = monthly_sales['fact_total_price'][:-12]  # Hold out the last 12 months for testing
 
+train_data = monthly_sales_train['fact_total_price'][:-12]  # Hold out the last 12 months for testing
+train_data.info()
 train_data.to_csv(
     # nombre del archivo
     'results/Analytics/train_data.csv', 
@@ -792,7 +1001,10 @@ plt.title('Monthly Sales Forecast')
 plt.savefig('results/Analytics/MonthlySalesForecast.png')
 #plt.show()
 
-#%%
+
+
+# %%
+
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 test_data = monthly_sales['fact_total_price'][-12:]
@@ -809,13 +1021,51 @@ print(f'Root Mean Squared Error (RMSE): {rmse}')
 mape = np.mean(np.abs((test_data - predicted_means) / test_data)) * 100
 print(f'Mean Absolute Percentage Error (MAPE): {mape}%')
 
-#%%
+data = [
+    ["Mean Absolute Error (MAE)", mae],
+    ["Root Mean Squared Error (RMSE)", rmse],
+    ["Mean Absolute Percentage Error (MAPE)", mape]
+]
+
+df_error = pd.DataFrame(data, columns=["Erro_type", "Value"])
+
+df_error.to_csv(
+    # nombre del archivo
+    'results/Analytics/error_type.csv', 
+    # flag para no escribir el indice del dataframe al csv
+    index=False
+    )
+
+
+# %%
+
+predicted_means = predicted_means.reset_index().rename(columns={"index": "year_month"})
+train_data = train_data.reset_index()
+test_data = test_data.reset_index()
+
+# %%
+
+#fig = px.line(monthly_sales, x='year_month', y='fact_total_price', title='Observed')
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=train_data["year_month"], y=train_data["fact_total_price"], name="Observed", mode="lines"))
+fig.add_trace(go.Scatter(x=predicted_means["year_month"], y=predicted_means["predicted_mean"], name="Forecast", 
+                         mode="lines", fillcolor='red',))
+fig.add_trace(go.Scatter(x=test_data["year_month"], y=test_data["fact_total_price"], name="Observed", 
+                         mode="lines", fillcolor='green',))
+fig.update_layout(
+    title="Monthly Sales Forecast", xaxis_title="Year Month", yaxis_title="Revenue"
+)
+
+fig.write_html('results/Analytics/MonthlySalesForecast.html')
+#fig.show()
+
+
+# %%
+
 division_item_sales = sales_data.groupby(['store_region', 'item_name'])['fact_total_price'].sum().reset_index()
-
-division_item_sales.to_csv('results/Analytics/divisions.csv',index=False )
-
+division_item_sales.to_csv('results/Analytics/Regions.csv',index=False )
 divisions = sales_data['store_region'].unique()
-
 divisions
 
 num_divisions = len(divisions)
@@ -829,6 +1079,8 @@ for i, division in enumerate(divisions):
     monthly_prices = division_data.groupby(['year', 'month'])['fact_total_price'].sum().reset_index()
     monthly_prices['year_month'] = pd.to_datetime(
         monthly_prices['year'].astype(str) + '-' + monthly_prices['month'].astype(str))
+
+    monthly_prices.index = pd.to_datetime(monthly_sales_train['year_month'])
 
     train_data = monthly_prices['fact_total_price'][:-12]  # Hold out the last 12 months for testing
 
@@ -847,6 +1099,19 @@ for i, division in enumerate(divisions):
     axes[i].legend()
     axes[i].set_title('Monthly Sales Forecast for ' + division)
 
+    predicted_means = predicted_means.reset_index().rename(columns={"index": "year_month"})
+    train_data = train_data.reset_index().rename(columns={"index": "year_month"})
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=train_data["year_month"], y=train_data["fact_total_price"], name="Observed", mode="lines"))
+    fig.add_trace(go.Scatter(x=predicted_means["year_month"], y=predicted_means["predicted_mean"], name="Forecast", 
+                             mode="lines", fillcolor='red',))
+    fig.update_layout(
+        title="Monthly Sales Forecast for " + division, xaxis_title="Year Month", yaxis_title="Revenue"
+    )
+
+    fig.write_html(f'results/Analytics/MonthlySalesForecastFor{division}.html')
+
 # Adjust layout spacing
 plt.tight_layout()
 
@@ -854,12 +1119,13 @@ plt.savefig('results/Analytics/MonthlySalesForecastByRegion.png')
 # Show all the subplots
 #plt.show()
 
-#%%
+# %%
+
 desc_sales = sales_data.groupby('item_desc')['fact_total_price'].sum().reset_index()
 
 desc_sales.to_csv(
     # nombre del archivo
-    'results/Analytics/divisions.csv', 
+    'results/Analytics/RevenuebyDescriptions.csv', 
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
@@ -882,7 +1148,8 @@ subset_df.to_csv(
     index=False
     )
 
-#%%"
+# %%"
+
 unique_desc = subset_df['item_desc'].unique()
 unique_desc
 for desc in unique_desc:
@@ -892,6 +1159,8 @@ for desc in unique_desc:
 
     monthly_prices['year_month'] = pd.to_datetime(
         monthly_prices['year'].astype(str) + '-' + monthly_prices['month'].astype(str))
+
+    monthly_prices.index = pd.to_datetime(monthly_sales_train['year_month'])
 
     train_data = monthly_prices['fact_total_price'][:-12]  # Hold out the last 12 months for testing
 
@@ -910,8 +1179,24 @@ for desc in unique_desc:
     plt.legend()
     plt.title('Monthly Sales Forecast for ' + desc)
     plt.savefig('results/Analytics/MonthlySalesForecastfor' + desc.replace("/", "-") +'.png')
+    
+    predicted_means = predicted_means.reset_index().rename(columns={"index": "year_month"})
+    train_data = train_data.reset_index().rename(columns={"index": "year_month"})
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=train_data["year_month"], y=train_data["fact_total_price"], name="Observed", mode="lines"))
+    fig.add_trace(go.Scatter(x=predicted_means["year_month"], y=predicted_means["predicted_mean"], name="Forecast", 
+                             mode="lines", fillcolor='red',))
+    fig.update_layout(
+        title="Monthly Sales Forecast for " + desc, xaxis_title="Year Month", yaxis_title="Revenue"
+    )
+
+    fig.write_html('results/Analytics/MonthlySalesForecastFor'+ desc.replace("/", "-") +'.html')
+    
     #plt.show()
-#%%
+
+# %%
+
 from mlxtend.frequent_patterns import apriori, association_rules
 from mlxtend.preprocessing import TransactionEncoder
 
@@ -929,40 +1214,53 @@ df.to_csv(
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
-#%%
+
+# %%
 
 frequent_itemsets = apriori(df, min_support=0.01, use_colnames=True)  # adjust the support as needed
 frequent_itemsets
 
-#%%
+# %%
 
 rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.01)  
 rules
 
-#%%
+# %%
 
 rules.sort_values(by='confidence', ascending=False, inplace=True)
 rules
 
-#%%
+# %%
+
 print(rules[['antecedents', 'consequents', 'support', 'confidence']].sort_values(by='confidence', ascending=False))
 rules.to_csv(
     # nombre del archivo
-    'results/Analytics/rules.csv', 
+    'results/Analytics/rulesAnalytics.csv', 
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
 
-#%%
+
+# %%
 
 # Scatter plot of Support vs Confidence
 plt.figure(figsize=(10, 6))
 sns.scatterplot(x='support', y='confidence', size='lift', data=rules)
 plt.title('Association Rules Scatter Plot (Support vs Confidence)')
-plt.savefig('results/Analytics/rules.png')
+plt.savefig('results/Analytics/AssociationRulesScatterPlot_SupportvsConfidence.png')
 #plt.show()
 
-#%%
+
+# %%
+
+#Number of Purchases vs Total Spent by Customers
+fig = px.scatter(rules, x='support', y='confidence', color='lift',
+                 hover_name='support', title='Association Rules Scatter Plot (Support vs Confidence)',size='lift')
+fig.update_layout(xaxis_title='Confidence', yaxis_title='Support')
+fig.write_html('results/Analytics/AssociationRulesScatterPlot_SupportvsConfidence.html')
+#fig.show()
+
+# %%
 
 import networkx as nx
 
@@ -985,16 +1283,18 @@ def draw_graph(rules, rules_to_show):
     weights = [G1[u][v]['weight'] for u, v in edges]
 
     pos = nx.spring_layout(G1, k=16, scale=1)
-    nx.draw(G1, pos, node_color='lightblue', edge_color=colors, width=weights, font_size=16, with_labels=True, node_size=3500, arrowsize=20)
+    nx.draw(G1, pos, node_color='lightblue', edge_color=colors, width=weights, 
+            font_size=16, with_labels=True, node_size=3500, arrowsize=20)
 
     plt.title('Network Graph of Association Rules')
     plt.savefig('results/Analytics/NetworkGraphofAssociationRules.png')
     #plt.show()
 
+   
 # Draw the graph for the top 10 rules
-draw_graph(rules, 10)
+draw_graph(rules, 20)
 
-#%%
+# %%
 
 def recommend_items_with_confidence(user_items, rules, top_n=5):
     """
@@ -1033,13 +1333,20 @@ def recommend_items_with_confidence(user_items, rules, top_n=5):
 
     return unique_recommendations
 
-#%%
+# %%
+
 user_items = ['Coffee Ground', 'Gum - Mints']  
-recommended_items_with_confidence = recommend_items_with_confidence(user_items, rules, top_n=5)
+recommended_items_with_confidence = recommend_items_with_confidence(user_items, rules, top_n=20)
 
 print("Recommended items with confidence:")
 for item, confidence in recommended_items_with_confidence:
     print(f"Item: {item}, Confidence: {confidence:.2f}")
     
-recommended_items_with_confidence
+df = pd.DataFrame(recommended_items_with_confidence, columns =['Item', 'Confidence'])
 
+df.to_csv(
+    # nombre del archivo
+    'results/Analytics/recommended_items_with_confidence.csv', 
+    # flag para no escribir el indice del dataframe al csv
+    index=False
+    )
