@@ -93,6 +93,16 @@ trans_type_by_bank.to_csv(
     )
 
 # %%
+#Transaction by bank
+fig = px.bar(trans_type_by_bank.sort_values(by='total_spent', ascending=False).head(15), y=['total_spent','number_of_purchases'], x='bank_name',
+              title='Top Bank revenue' ,orientation = "v",  barmode = 'group', labels={'total_spent':'Revenue','number_of_purchases':'Num Sales'})
+
+fig.update_layout(xaxis_title='Bank', yaxis_title='Revenue')
+fig.write_html('results/HTML/transations_by_bank.html')
+#fig.show()
+
+
+# %%
 
 #Numero de Transacciones por tipo de transaccion.
 
@@ -124,9 +134,6 @@ plt.title('Transaction Type Distribution')
 plt.xlabel('Number of purchases', fontsize=16, labelpad=20, color='maroon')
 plt.ylabel('Transaction Type', fontsize=16, labelpad=20, color='maroon')
 
-#write_html('results/HTML/TransactionTypeDistribution.html')
-#fig.savefig("results/HTML/TransactionTypeDistribution.html", format='html')
-
 plt.savefig('results/EDA/TransactionTypeDistribution.png')
 #plt.show()
 
@@ -136,29 +143,28 @@ plt.savefig('results/EDA/TransactionTypeDistribution.png')
 fig = px.bar(trans_type_agg, x='trans_type', y='number_of_purchases', 
              title="Transaction Type", hover_data=['trans_type', 'number_of_purchases','total_spent'], color='trans_type',
              labels={'total_spent':'Total Spent','number_of_purchases':'Num Sales','trans_type':'Transaction type'}, height=600,text_auto=True)
-fig.write_html("results/EDA/TransactionTypeDistribution.html")
+fig.write_html("results/HTML/TransactionTypeDistribution.html")
 #fig.show()
 
 
 # %%
 
 #Pie Chart Transacction type
-
+trans_type_agg.index=trans_type_agg['trans_type']
 fig = plt.figure(figsize=(6,6), dpi=100)
 ax = plt.subplot(111)
 myexplode = [0.2, 0, 0]
 mycolors = ["cyan", "yellow", "green"]
-trans_type_agg.plot.pie(y='number_of_purchases', ax=ax, autopct='%1.1f%%', startangle=270, fontsize=12, 
+#labels = trans_type_agg['trans_type'].list()
+trans_type_agg.plot.pie(y='number_of_purchases', ax=ax, autopct='%1.2f%%', startangle=0, fontsize=12, 
                         label="Transaction Type", explode = myexplode, shadow = True,
                         colors = mycolors)
 plt.legend()
 plt.title('Transaction Type Distribution')
 plt.savefig('results/EDA/Pie-TransactionTypeDistribution.png')
-#plt.write_html('results/HTML/Pie-TransactionTypeDistribution.html')
 
 #plt.show()
 
-#sales_data.plot(kind='pie', y='trans_type', labels=df['team'])
 
 # %%
 
@@ -167,10 +173,38 @@ plt.savefig('results/EDA/Pie-TransactionTypeDistribution.png')
 fig = px.pie(trans_type_agg, names='trans_type', values='number_of_purchases', color='number_of_purchases', 
              title="Transaction Type",labels={'trans_type':'Transaction type','number_of_purchases':'Purchases'}, height=600)
 fig.update_traces(textposition='inside', textinfo='percent')
-fig.write_html("results/EDA/Pie-TransactionTypeDistribution.html")
+fig.write_html("results/HTML/Pie-TransactionTypeDistribution.html")
 #fig.show()
 
 
+# %%
+
+#Pie Chart Transacction type
+trans_type_agg.index=trans_type_agg['trans_type']
+fig = plt.figure(figsize=(6,6), dpi=100)
+ax = plt.subplot(111)
+myexplode = [0.2, 0, 0]
+mycolors = ["gray", "yellow", "green"]
+#labels = trans_type_agg['trans_type'].list()
+trans_type_agg.plot.pie(y='total_spent', ax=ax, autopct='%1.2f%%', startangle=0, fontsize=12, 
+                        label="Transaction Type", explode = myexplode, shadow = True,
+                        colors = mycolors)
+plt.legend()
+plt.title('Transaction Type Distribution by Revenue')
+plt.savefig('results/EDA/Pie-TransactionTypeDistributionRevenue.png')
+
+#plt.show()
+
+
+# %%
+
+#Pie chart using px
+
+fig = px.pie(trans_type_agg, names='trans_type', values='total_spent', color='total_spent', 
+             title="Transaction Type",labels={'trans_type':'Transaction type','total_spent':'Revenue'}, height=600)
+fig.update_traces(textposition='inside', textinfo='percent')
+fig.write_html("results/HTML/Pie-TransactionTypeDistributionRevenue.html")
+#fig.show()
 
 # %%
 
@@ -232,7 +266,7 @@ customer_analysis.sort_values(by='total_spent', ascending=False).head(10)
 fig = px.bar(customer_analysis.sort_values(by='total_spent', ascending=False).head(20), x='total_spent', y='customer_name',  orientation='h',
              title="Top 10 Customers", hover_data=['customer_name', 'number_of_purchases','total_spent'], color='total_spent',
              labels={'total_spent':'Total Spent','number_of_purchases':'Num Sales','customer_name':'Name'}, height=600,text_auto=True)
-fig.write_html("results/EDA/Top10Customers.html")
+fig.write_html("results/HTML/Top10Customers.html")
 #fig.show()
 
 
@@ -257,7 +291,7 @@ fig = px.histogram(customer_analysis, x='total_spent',
                    title='Distribution of Total Spent by Customers',
                    nbins=500000,text_auto=True)  # Adjust the number of bins as needed
 fig.update_layout(xaxis_title='Total Spent', yaxis_title='Count of Customers')
-fig.write_html('results/EDA/DistributionTotalSpentbyCustomers.html')
+fig.write_html('results/HTML/DistributionTotalSpentbyCustomers.html')
 #fig.show()
 
 # %%
@@ -277,7 +311,7 @@ fig.write_html('results/EDA/DistributionTotalSpentbyCustomers.html')
 fig = px.scatter(customer_analysis, x='number_of_purchases', y='total_spent', color='total_spent',
                  hover_name='customer_name', title='Number of Purchases vs Total Spent by Customers',size='total_spent')
 fig.update_layout(xaxis_title='Number of Purchases', yaxis_title='Total Spent')
-fig.write_html('results/EDA/NumberofPurchases.html')
+fig.write_html('results/HTML/NumberofPurchasesbyCustomers.html')
 #fig.show()
 
 # %%
@@ -303,16 +337,17 @@ customer_analysis_sorted = customer_analysis_sorted.sort_values('total_spent', a
 customer_analysis_sorted
 customer_analysis_sorted.to_csv(
     # nombre del archivo
-    'results/EDA/customer_analysis_sorted.csv', 
+    'results/EDA/CumulativeDistributionofTotalSpentbyCustomers.csv', 
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
-customer_analysis_sorted.sample()
+
+
 fig = px.line(customer_analysis_sorted, y='cumulative_percentage',
               title='Cumulative Distribution of Total Spent by Customers')
 fig.update_layout(xaxis_title='Number of Customers', yaxis_title='Cumulative Percentage of Total Spent')
 fig.update_xaxes(range=[0, 1000])  # Adjust the range as needed
-fig.write_html('results/EDA/CumulativeDistributionofTotalSpentbyCustomers.html')
+fig.write_html('results/HTML/CumulativeDistributionofTotalSpentbyCustomers.html')
 #fig.show()
 
 # %%
@@ -419,7 +454,7 @@ fig = px.bar(suppliers_performance.sort_values('total_revenue', ascending=False)
              title="Revenue by supplier", hover_data=['total_revenue', 'item_supplier','number_of_sales'], color='item_supplier',
              labels={'total_revenue':'Total Revenue','number_of_sales':'Num Sales','item_supplier':'Supplier'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/RevenueBySuppliers.html")
+fig.write_html("results/HTML/RevenueBySuppliers.html")
 #fig.show()
 
 
@@ -445,7 +480,7 @@ fig = px.bar(suppliers_performance.sort_values('number_of_sales', ascending=Fals
              title="Salese by supplier", hover_data=['number_of_sales', 'item_supplier','total_revenue'], color='item_supplier',
              labels={'total_revenue':'Total Revenue','number_of_sales':'Num Sales','item_supplier':'Supplier'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/SalesBySuppliers.html")
+fig.write_html("results/HTML/SalesBySuppliers.html")
 #fig.show()
 
 
@@ -471,7 +506,7 @@ fig = px.bar(country_sales.sort_values('fact_total_price', ascending=False), x='
              color='item_man_country',
              labels={'fact_total_price':'Total Revenue','item_man_country':'Country Supplier'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/DistributionManufacturingCountries.html")
+fig.write_html("results/HTML/DistributionManufacturingCountries.html")
 #fig.show()
 
 
@@ -505,7 +540,23 @@ print("\Revenue by Store:\n",sales_data.groupby('store_key')['fact_total_price']
 
 # %%
 
-'''store performance by Region, District, Sub-District'''
+'''# Store performance by Region, District, Sub-District'''
+
+# %%
+#Store Performance by Location
+
+store_performance_by_location= sales_data.groupby(
+    ['store_region','store_district']).agg(        
+        {'store_key':'count', # suma de los precios de los artículos
+        'fact_total_price': 'sum'}
+                      ).reset_index().rename(columns={
+                          'store_key':'number_of_sales',
+                          'fact_total_price':'total_revenue'})
+
+
+fig = px.treemap(store_performance_by_location, path=['store_region', 'store_district'], values='total_revenue',
+                 title='Store Performance by Region and District')
+fig.write_html("results/HTML/store_performance_by_location.html")
 
 
 # %%
@@ -525,7 +576,7 @@ plt.figure(figsize=(12, 8))
 sns.barplot(x='fact_total_price', y='store_region', 
             data=region_sales.sort_values(by='fact_total_price', ascending=False), palette='coolwarm')
 
-plt.title('Top 10 Revenue-Generating Regions', fontsize=16, fontweight='bold', color='navy')
+plt.title('Top Revenue-Generating Regions', fontsize=16, fontweight='bold', color='navy')
 plt.xlabel('Total Revenue', fontsize=14, labelpad=15, color='navy')
 plt.ylabel('Region', fontsize=14, labelpad=15, color='navy')
 plt.xticks(fontsize=12, color='navy')
@@ -543,7 +594,31 @@ fig = px.bar(region_sales.sort_values(by='fact_total_price', ascending=False), x
              color='store_region',
              labels={'fact_total_price':'Total Revenue','store_region':'Region'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/TopRevenue-GeneratingRegions.html")
+fig.write_html("results/HTML/TopRevenue-GeneratingRegions.html")
+#fig.show()
+
+
+# %%
+
+#Pie Chart Generating Regions type
+region_sales.index=region_sales['store_region']
+fig = plt.figure(figsize=(10,10), dpi=300)
+ax = plt.subplot(111)
+region_sales.plot.pie(y='fact_total_price', ax=ax, autopct='%1.1f%%', startangle=270, fontsize=14, 
+                        label="Region")
+plt.legend()
+plt.title('Revenue-Generating by Regions')
+plt.savefig('results/EDA/Pie-TopRevenue-GeneratingRegions.png')
+
+
+# %%
+
+#Pie chart using px
+
+fig = px.pie(region_sales, names='store_region', values='fact_total_price', color='fact_total_price', 
+             title="Revenue-Generating by Regions",labels={'store_region':'Region','fact_total_price':'Total Renenue'}, height=600)
+fig.update_traces(textposition='inside', textinfo='percent')
+fig.write_html("results/HTML/Pie-TopRevenue-GeneratingRegions.html")
 #fig.show()
 
 
@@ -583,12 +658,13 @@ fig = px.bar(district_sales.sort_values(by='fact_total_price', ascending=False).
              color='store_district',
              labels={'fact_total_price':'Total Revenue','store_district':'District'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/Top10Revenue-GeneratingbyDistrict.html")
+fig.write_html("results/HTML/Top10Revenue-GeneratingbyDistrict.html")
 #fig.show()
 
 
 # %%
-'''Time Analysis'''
+
+''' # Time Analysis'''
 
 
 #%%
@@ -629,7 +705,7 @@ fig = px.bar(sales_by_year, x='year', y='number_of_sales',
              color='year',
              labels={'year':'Year','number_of_sales':'Total Sales'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/SalesDistributionofYears.html")
+fig.write_html("results/HTML/SalesDistributionofYears.html")
 #fig.show()
 
 # %%
@@ -651,7 +727,7 @@ fig = px.bar(sales_by_year, x='year', y='total_revenue',
              color='year',
              labels={'year':'Year','total_revenue':'Total Revenue'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/RevenueDistributionofYears.html")
+fig.write_html("results/HTML/RevenueDistributionofYears.html")
 #fig.show()
 
 # %%
@@ -675,7 +751,7 @@ fig = px.histogram(sales_data, x='fact_total_price',
                    title='Distribution of Total Prices',
                    nbins=30,text_auto=True, labels={'fact_total_price':'Price','count':'Sales'})  # Adjust the number of bins as needed
 fig.update_layout(xaxis_title='Total Price', yaxis_title='Count of Sales')
-fig.write_html('results/EDA/DistributionofTotalPrices.html')
+fig.write_html('results/HTML/DistributionofTotalPrices.html')
 #fig.show()
 
 # %%
@@ -711,7 +787,7 @@ plt.savefig('results/EDA/TotalRevenueOverTime_Monthly.png')
 fig = px.line(monthly_sales,x='year_month', y='fact_total_price',
               title='Total Sales Over Time (Monthly)',labels={'year_month':'Month','fact_total_price':'Total Revenue'})
 fig.update_layout(xaxis_title='Year-Month', yaxis_title='Total Sales')
-fig.write_html('results/EDA/TotalRevenueOverTime_Monthly.html')
+fig.write_html('results/HTML/TotalRevenueOverTime_Monthly.html')
 #fig.show()
 
 
@@ -745,7 +821,7 @@ fig = px.bar(item_sales.sort_values(by='fact_total_price', ascending=False).head
              color='item_name',
              labels={'fact_total_price':'Total Revenue','item_name':'Products'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/Top10Revenue-GeneratingItems.html")
+fig.write_html("results/HTML/Top10Revenue-GeneratingItems.html")
 #fig.show()
 
 # %%
@@ -786,7 +862,7 @@ fig = px.bar(desc_sales.sort_values(by='fact_total_price', ascending=False).head
              color='item_desc',
              labels={'fact_total_price':'Total Revenue','item_desc':'Description'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/Top10Revenue-GeneratingDescriptions.html")
+fig.write_html("results/HTML/Top10Revenue-GeneratingDescriptions.html")
 #fig.show()
 
 
@@ -830,50 +906,9 @@ fig = px.bar(desc_sales.sort_values(by='fact_total_price', ascending=False).head
              color='item_desc',
              labels={'fact_total_price':'Total Revenue','item_desc':'Description'}, 
              height=600,text_auto=True)
-fig.write_html("results/EDA/Top10Revenue-GeneratingDescriptions.html")
+fig.write_html("results/HTML/Top10Revenue-GeneratingDescriptions.html")
 #fig.show()
 
-
-# %%
-
-#Top 10 Divisions by Total Sales
-
-division_sales = sales_data.groupby('store_region')['fact_total_price'].sum().reset_index()
-
-print(division_sales.sort_values(by='fact_total_price', ascending=False).head(10))
-
-
-division_sales.to_csv(
-    # nombre del archivo
-    'results/EDA/division_sales.csv', 
-    # flag para no escribir el indice del dataframe al csv
-    index=False
-    )
-plt.figure(figsize=(14, 9))
-sns.barplot(x='fact_total_price', y='store_region', 
-            data=division_sales.sort_values(by='fact_total_price', ascending=False).head(10), palette='inferno')
-
-# Enhance the plot's aesthetics
-plt.title('Total Revenue by Region', fontsize=18, fontweight='bold', color='maroon')
-plt.xlabel('Total Sales', fontsize=16, labelpad=20, color='maroon')
-plt.ylabel('Region', fontsize=16, labelpad=20, color='maroon')
-plt.xticks(fontsize=14, color='maroon')
-plt.yticks(fontsize=14, color='maroon')
-plt.grid(color='gray', linestyle='--', linewidth=0.5)
-
-plt.tight_layout()  
-plt.savefig('results/EDA/TotalRevenuebyRegion.png')
-#plt.show()
-
-# %%
-
-fig = px.bar(division_sales.sort_values(by='fact_total_price', ascending=False).head(10), x='fact_total_price', y='store_region', 
-             title="Total Revenue by Region", hover_data=['fact_total_price', 'store_region'], 
-             color='store_region',
-             labels={'fact_total_price':'Total Revenue','store_region':'Region'}, 
-             height=600,text_auto=True)
-fig.write_html("results/EDA/TotalRevenuebyRegion.html")
-#fig.show()
 
 # %%
 
@@ -923,7 +958,7 @@ fig = px.bar(top_5_items_in_division, x='fact_total_price', y='store_region',
              labels={'fact_total_price':'Total Revenue','store_region':'Region','item_name':'Product'}, 
              height=800,text_auto=True)
 fig.update_layout(barmode='group', xaxis={'categoryorder':'category ascending'})
-fig.write_html("results/EDA/Top5PerformingItemsinEachRegion.html")
+fig.write_html("results/HTML/Top5PerformingItemsinEachRegion.html")
 #fig.show()
 
 # %%
@@ -947,7 +982,7 @@ fig = px.bar(top_5_items_in_division, x='fact_total_price', y='item_name',
              labels={'fact_total_price':'Total Revenue','store_region':'Region','item_name':'Product'}, 
              height=800)
 fig.update_layout(barmode='group', xaxis={'categoryorder':'category ascending'})
-fig.write_html("results/EDA/Top5PerformingItemsinEachRegionByRegion.html")
+fig.write_html("results/HTML/Top5PerformingItemsinEachRegionByRegion.html")
 #fig.show()
 
 # %% 
@@ -1350,3 +1385,4 @@ df.to_csv(
     # flag para no escribir el indice del dataframe al csv
     index=False
     )
+ 
